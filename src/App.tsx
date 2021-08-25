@@ -23,7 +23,6 @@ const accurateInterval = function (fn: any, time: any) {
         cancel: cancel,
     };
 };
-let intervalID: any = null;
 
 type AppProps = {};
 
@@ -34,6 +33,7 @@ type AppState = {
     timeState: string;
     timerType: string;
     intervalID: any;
+    alarmColor: object;
 };
 
 export class App extends React.Component<AppProps, AppState> {
@@ -46,6 +46,7 @@ export class App extends React.Component<AppProps, AppState> {
             timeState: "stopped",
             timerType: "Session",
             intervalID: "",
+            alarmColor: { color: "#2c3e50" },
         };
         this.reset = this.reset.bind(this);
         this.clockDisplay = this.clockDisplay.bind(this);
@@ -54,6 +55,10 @@ export class App extends React.Component<AppProps, AppState> {
         this.timerControl = this.timerControl.bind(this);
         this.countDown = this.countDown.bind(this);
         this.countDownControl = this.countDownControl.bind(this);
+        this.switchTimer = this.switchTimer.bind(this);
+        this.alarmActivate = this.alarmActivate.bind(this);
+        this.warningTimer = this.warningTimer.bind(this);
+        this.checkTimer = this.checkTimer.bind(this);
     }
 
     audioBeep: any = "";
@@ -65,6 +70,7 @@ export class App extends React.Component<AppProps, AppState> {
             timer: 1500,
             timeState: "stopped",
             timerType: "Session",
+            alarmColor: { color: "#2c3e50" },
         });
         if (this.state.intervalID) {
             this.state.intervalID.cancel();
@@ -123,13 +129,9 @@ export class App extends React.Component<AppProps, AppState> {
                 this.setState({
                     timer: this.state.timer - 1,
                 });
+                this.checkTimer();
             }, 1000),
         });
-        /*intervalID = setInterval(() => {
-            this.setState({
-                timer: this.state.timer - 1,
-            });
-        }, 1000);*/
     };
 
     countDownControl() {
@@ -144,10 +146,42 @@ export class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    switchTimer = (): void => {};
-    alarm = (_timer: number): void => {
+    switchTimer = (num: number, str: string): void => {
+        this.setState({
+            timer: num,
+            timerType: str,
+            alarmColor: { color: "#2c3e50" },
+        });
+    };
+    alarmActivate = (_timer: number): void => {
         if (_timer === 0) {
             this.audioBeep.play();
+        }
+    };
+
+    warningTimer = (_timer: number): void => {
+        if (_timer < 61) {
+            this.setState({ alarmColor: { color: "#C0392B" } });
+        } else {
+            this.setState({ alarmColor: { color: "#2c3e50" } });
+        }
+    };
+
+    checkTimer = (): void => {
+        let timer = this.state.timer;
+        this.warningTimer(timer);
+        this.alarmActivate(timer);
+        if (timer < 0) {
+            if (this.state.intervalID) {
+                this.state.intervalID.cancel();
+            }
+            if (this.state.timerType === "Session") {
+                this.countDown();
+                this.switchTimer(this.state.break * 60, "Break");
+            } else {
+                this.countDown();
+                this.switchTimer(this.state.session * 60, "Session");
+            }
         }
     };
 
@@ -176,6 +210,7 @@ export class App extends React.Component<AppProps, AppState> {
                 <Session
                     title={this.state.timerType}
                     timer={this.clockDisplay}
+                    styled={this.state.alarmColor}
                 />
                 <Buttons
                     playStop={this.countDownControl}
@@ -189,6 +224,16 @@ export class App extends React.Component<AppProps, AppState> {
                     }}
                     src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
                 />
+                <div className="author">
+                    {" "}
+                    Coded by <br />
+                    <a
+                        href="https://github.com/anthoHerrera/clock_25_add_5"
+                        target="_blank"
+                    >
+                        Anthony Herrera
+                    </a>
+                </div>
             </div>
         );
     }

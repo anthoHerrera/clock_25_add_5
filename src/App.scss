@@ -88,4 +88,12 @@
             font-size: 2em;
         }
     }
+
+    .author {
+        margin-top: 2em;
+        font-size: 0.7em;
+        text-align: center;
+        grid-column: 1 / 3;
+        grid-row: 5;
+    }
 }

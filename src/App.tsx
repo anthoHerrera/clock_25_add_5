@@ -56,6 +56,8 @@ export class App extends React.Component<AppProps, AppState> {
         this.countDownControl = this.countDownControl.bind(this);
     }
 
+    audioBeep: any = "";
+
     reset = (): void => {
         this.setState({
             break: 5,
@@ -142,6 +144,13 @@ export class App extends React.Component<AppProps, AppState> {
         }
     }
 
+    switchTimer = (): void => {};
+    alarm = (_timer: number): void => {
+        if (_timer === 0) {
+            this.audioBeep.play();
+        }
+    };
+
     render() {
         return (
             <div id="app">
@@ -171,6 +180,14 @@ export class App extends React.Component<AppProps, AppState> {
                 <Buttons
                     playStop={this.countDownControl}
                     resetTimer={this.reset}
+                />
+                <audio
+                    id="beep"
+                    preload="auto"
+                    ref={(audio) => {
+                        this.audioBeep = audio;
+                    }}
+                    src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
                 />
             </div>
         );
